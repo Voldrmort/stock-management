@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./stock-management-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" # Map host port 3000 to container port 80 (NGINX)
+    environment:
+      - REACT_APP_API_URL=http://backend:5000 # Backend service URL
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./stock-management-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Map host port 5000 to container port 5000
+    environment:
+      - NODE_ENV=production
+      - CLOUDANT_URL=https://734c88b8-21d6-4ef6-b4f4-77c27b04a37f-bluemix.cloudantnosqldb.appdomain.cloud # Environment variable for Cloudant URL
+      - CLOUDANT_APIKEY=S4j92YLK5QSSE1Zy3xd5vAyJQpqTiG7GffYhgFEg7Flw  # Environment variable for Cloudant API key
+      - JWT_SECRET=your_super_secret_key # Optional: Add this for authentication purposes
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
